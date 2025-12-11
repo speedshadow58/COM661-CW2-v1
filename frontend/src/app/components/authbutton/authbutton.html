@@ -1,0 +1,43 @@
+<div class="d-flex align-items-center gap-2 text-light">
+  <ng-container *ngIf="token$ | async; else backendLogin">
+    <span class="small">Logged in</span>
+    <button class="btn btn-outline-light btn-sm" (click)="logoutBackend()">Logout</button>
+    <span *ngIf="loginSuccessMsg" class="badge bg-success text-light">{{ loginSuccessMsg }}</span>
+  </ng-container>
+
+  <ng-template #backendLogin>
+    <div class="d-flex flex-column gap-1">
+      <form [formGroup]="loginForm" (ngSubmit)="submitBackendLogin()" class="d-flex gap-2 align-items-center flex-wrap">
+        <input formControlName="username" type="text" class="form-control form-control-sm" placeholder="user" style="width: 110px;">
+        <input formControlName="password" type="password" class="form-control form-control-sm" placeholder="pass" style="width: 110px;">
+        <button type="submit" class="btn btn-outline-light btn-sm" [disabled]="!loginForm.valid || isLoggingIn">
+          {{ isLoggingIn ? 'Logging in...' : 'Login' }}
+        </button>
+        <button type="button" class="btn btn-outline-warning btn-sm" (click)="showRegister = !showRegister">Register</button>
+      </form>
+      <div class="small">
+        <span *ngIf="loginSuccessMsg" class="auth-success-message me-2">{{ loginSuccessMsg }}</span>
+        <span *ngIf="backendAuthError" class="text-warning">{{ backendAuthError }}</span>
+      </div>
+
+      <form *ngIf="showRegister" [formGroup]="registerForm" (ngSubmit)="submitRegister()" class="d-flex gap-2 align-items-center flex-wrap">
+        <input formControlName="username" type="text" class="form-control form-control-sm" placeholder="new user" style="width: 110px;">
+        <input formControlName="password" type="password" class="form-control form-control-sm" placeholder="password" style="width: 110px;">
+        <select formControlName="role" class="form-select form-select-sm" style="width: 110px;">
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+        </select>
+        <button type="submit" class="btn btn-outline-success btn-sm" [disabled]="!registerForm.valid || isRegistering">
+          {{ isRegistering ? 'Creating...' : 'Create' }}
+        </button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" (click)="showRegister = false">Cancel</button>
+      </form>
+      <div class="small">
+        <span *ngIf="registerSuccessMsg" class="auth-success-message me-2">{{ registerSuccessMsg }}</span>
+        <span *ngIf="backendRegisterError" class="text-warning">{{ backendRegisterError }}</span>
+      </div>
+    </div>
+  </ng-template>
+</div>
+
+

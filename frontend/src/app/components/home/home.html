@@ -1,0 +1,185 @@
+<div class="home-container">
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Steam Game Directory</h1>
+      <p class="tagline">Explore thousands of games, read community reviews, and discover your next favorite</p>
+      
+      <div class="search-box">
+        <input 
+          type="text" 
+          [(ngModel)]="searchQuery" 
+          placeholder="Search games..." 
+          (keyup.enter)="search()"
+          class="search-input"
+        />
+        <button (click)="search()" class="search-btn">Search</button>
+      </div>
+      
+      <button (click)="browseAllGames()" class="cta-button">Browse All Games</button>
+    </div>
+  </section>
+
+  <!-- Statistics Cards -->
+  <section class="stats-section">
+    <h2>Community Stats</h2>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-number">{{ stats.totalGames }}</div>
+        <div class="stat-label">Games in Directory</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">{{ stats.totalReviews }}</div>
+        <div class="stat-label">Community Reviews</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">{{ recentReviewsCount }}</div>
+        <div class="stat-label">Recent Reviews</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Top Games by Sentiment -->
+  <section class="featured-section">
+    <div class="section-header">
+      <h2>Most Positively Reviewed</h2>
+      <a (click)="browseTopRated()" class="view-all" style="cursor: pointer;">View All →</a>
+    </div>
+    <div class="games-carousel">
+      <div *ngFor="let game of topGames" class="game-card" (click)="navigateToGame(game.appid)">
+        <div class="game-image">
+          <img [src]="'https://cdn.cloudflare.steamstatic.com/steam/apps/' + game.appid + '/capsule_184x69.jpg'"
+               (error)="onImageError($event, game.appid)" 
+               alt="{{ game.name }}" class="img-fluid rounded">
+        </div>
+        <div class="game-info">
+          <h3>{{ game.name }}</h3>
+          <p class="price">£{{ (game.price || 0) | number:'1.2-2' }}</p>
+          <p class="rating" *ngIf="game.review_score">{{ game.review_score }}% Positive</p>
+          <p *ngIf="game.reviews?.positive && game.reviews?.negative" class="text-muted small">
+            {{ (game.reviews.positive + game.reviews.negative) | number }} reviews
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Value for Money Games -->
+  <section class="featured-section">
+    <div class="section-header">
+      <h2>Best Value for Money</h2>
+      <a (click)="browseValueGames()" class="view-all" style="cursor: pointer;">View All →</a>
+    </div>
+    <div class="games-carousel">
+      <div *ngFor="let game of valueGames" class="game-card" (click)="navigateToGame(game.appid)">
+        <div class="game-image">
+          <img [src]="'https://cdn.cloudflare.steamstatic.com/steam/apps/' + game.appid + '/capsule_184x69.jpg'"
+               (error)="onImageError($event, game.appid)" 
+               alt="{{ game.name }}" class="img-fluid rounded">
+        </div>
+        <div class="game-info">
+          <h3>{{ game.name }}</h3>
+          <p class="price">£{{ (game.price || 0) | number:'1.2-2' }}</p>
+          <div class="value-score">
+            <span class="score-badge">{{ game.positive_ratio || (game.reviews?.positive / (game.reviews?.positive + game.reviews?.negative) * 100) | number:'1.0-0' }}% positive</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sentiment Breakdown -->
+  <section class="featured-section">
+    <div class="section-header">
+      <h2>Community Sentiment Leaders</h2>
+      <a (click)="browseSentimentGames()" class="view-all" style="cursor: pointer;">View All →</a>
+    </div>
+    <div class="games-carousel">
+      <div *ngFor="let game of sentimentGames" class="game-card" (click)="navigateToGame(game.appid)">
+        <div class="game-image">
+          <img [src]="'https://cdn.cloudflare.steamstatic.com/steam/apps/' + game.appid + '/capsule_184x69.jpg'"
+               (error)="onImageError($event, game.appid)" 
+               alt="{{ game.name }}" class="img-fluid rounded">
+        </div>
+        <div class="game-info">
+          <h3>{{ game.name }}</h3>
+          <p class="price">£{{ (game.price || 0) | number:'1.2-2' }}</p>
+          <div class="sentiment-bars">
+            <div class="sentiment-bar">
+              <div class="bar positive-bar" [style.width.%]="game.positive_percent"></div>
+            </div>
+            <div class="sentiment-labels">
+              <span class="positive">{{ game.positive_percent }}%</span>
+              <span class="negative">{{ game.negative_percent }}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Latest Reviews Widget -->
+  <section class="reviews-section">
+    <h2>Latest Reviews</h2>
+    <div *ngIf="loading" class="reviews-loading">Loading reviews...</div>
+    <div class="reviews-grid">
+      <div *ngFor="let review of recentReviews" class="review-card">
+        <div class="review-header">
+          <a [routerLink]="['/game', review.gameAppid]" class="game-link">
+            {{ review.gameName }}
+          </a>
+        </div>
+        <div class="review-meta">
+          <span class="reviewer">{{ review.username || 'Anonymous' }}</span>
+          <span 
+            class="rating-badge" 
+            [ngClass]="getRatingPercent(review.rating) >= 60 ? 'positive' : 'negative'"
+          >
+            {{ getRatingPercent(review.rating) }}%
+          </span>
+        </div>
+        <p class="review-text">
+          {{ (review.review_text || review.comment || '').substring(0, 100) }}{{ (review.review_text || review.comment || '').length > 100 ? '...' : '' }}
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Links -->
+  <section class="quick-links-section">
+    <h2>Quick Links</h2>
+    <div class="quick-links">
+      <button [routerLink]="['/games']" class="quick-link-btn">
+        <span class="icon">🎮</span>
+        <span>Browse All Games</span>
+      </button>
+      <button (click)="browseTopRated()" class="quick-link-btn">
+        <span class="icon">⭐</span>
+        <span>Top Rated</span>
+      </button>
+      <button [routerLink]="['/admin']" class="quick-link-btn">
+        <span class="icon">📋</span>
+        <span>Admin Panel</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section class="about-section">
+    <h2>About This Directory</h2>
+    <div class="about-content">
+      <p>
+        Welcome to the Steam Game Directory, a community-driven platform for exploring and reviewing games. 
+        Our mission is to provide a centralized hub where gamers can discover new titles, share their experiences, 
+        and help others make informed decisions about which games to play.
+      </p>
+      <h3>Features:</h3>
+      <ul>
+        <li><strong>Comprehensive Game Library:</strong> Browse thousands of games with detailed information</li>
+        <li><strong>Community Reviews:</strong> Read and write detailed reviews to share your gaming experience</li>
+        <li><strong>Easy Discovery:</strong> Search and filter games to find exactly what you're looking for</li>
+        <li><strong>Advanced Analytics:</strong> Discover games by sentiment, value for money, and community recommendations</li>
+      </ul>
+    </div>
+  </section>
+</div>

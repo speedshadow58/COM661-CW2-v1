@@ -1,0 +1,102 @@
+/* Improved compact and fit styles */
+.card {
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: visible;
+  width: 100%;
+}
+
+.table {
+  font-size: 0.97rem;
+}
+
+.table th, .table td {
+  vertical-align: middle;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 180px;
+}
+
+.table td {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.search-bar {
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.search-input {
+  min-width: 220px;
+}
+
+.games-table-container {
+  overflow-x: auto;
+}
+/* Container styling to match game management */
+.game-management-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px 24px 24px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+}
+
+.header h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #343a40;
+}
+
+.card {
+  border-radius: 10px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+}
+
+.table {
+  margin-top: 16px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.table th, .table td {
+  vertical-align: middle;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.search-input {
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+  padding: 6px 12px;
+}
+
+.loading-spinner {
+  margin-top: 32px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.page-info {
+  font-weight: 500;
+  color: #495057;
+}
+
+.alert {
+  margin-top: 16px;
+}

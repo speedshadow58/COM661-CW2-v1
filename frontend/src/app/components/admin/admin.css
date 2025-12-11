@@ -1,0 +1,44 @@
+.table-responsive {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.text-truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-body h2 {
+  font-size: 2.5rem;
+  margin: 0;
+}
+
+/* Audit log badges */
+.badge-danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+.badge-success {
+  background-color: #28a745;
+  color: white;
+}
+
+.badge-warning {
+  background-color: #ffc107;
+  color: black;
+}
+
+.badge-info {
+  background-color: #17a2b8;
+  color: white;
+}
+
+code {
+  font-size: 0.875rem;
+  color: #e83e8c;
+  background-color: #f8f9fa;
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.25rem;
+}

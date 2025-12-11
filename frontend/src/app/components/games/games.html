@@ -1,0 +1,268 @@
+<div class="container mt-4">
+
+  <!-- Stats row -->
+  <div class="row mb-4" *ngIf="gameStats">
+    <div class="col-md-4">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-body text-center py-4">
+          <h6 class="text-muted mb-3 fw-600">📊 Total Games</h6>
+          <h2 class="card-title text-primary fw-bold">{{ gameStats.total_games | number }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-body text-center py-4">
+          <h6 class="text-muted mb-3 fw-600">💰 Average Price</h6>
+          <h2 class="card-title text-success fw-bold">£{{ gameStats.average_price | number:'1.2-2' }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-body text-center py-4">
+          <h6 class="text-muted mb-3 fw-600">🔥 Most Popular</h6>
+          <h3 class="card-title text-danger fw-bold" style="font-size: 1.1rem;">{{ gameStats.top_peak_game }}</h3>
+          <p class="text-muted small mb-0">{{ gameStats.top_peak_ccu | number }} peak players</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters row -->
+  <div class="row mb-4 justify-content-center">
+    <div class="col-lg-10 col-xl-9">
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">🔍 Filter Games</h5>
+          <small class="text-light">Refine your search</small>
+        </div>
+        <div class="card-body bg-light">
+          <form class="row g-3 justify-content-center text-center">
+            <div class="col-md-3">
+              <label class="form-label fw-500">Genre</label>
+              <input type="text" [(ngModel)]="filterParams.genre" name="genre" class="form-control form-control-sm" placeholder="e.g., Action">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label fw-500">Game Name</label>
+              <input type="text" [(ngModel)]="filterParams.name" name="name" class="form-control form-control-sm" placeholder="e.g., Portal">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label fw-500">Tag</label>
+              <input type="text" [(ngModel)]="filterParams.tag" name="tag" class="form-control form-control-sm" placeholder="e.g., Indie">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label fw-500">Developer</label>
+              <input type="text" [(ngModel)]="filterParams.developer" name="developer" class="form-control form-control-sm" placeholder="e.g., Valve">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label fw-500">Language</label>
+              <input type="text" [(ngModel)]="filterParams.language" name="language" class="form-control form-control-sm" placeholder="e.g., English">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label fw-500">Min £</label>
+              <input type="number" [(ngModel)]="filterParams.price_min" name="price_min" class="form-control form-control-sm" placeholder="0">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label fw-500">Max £</label>
+              <input type="number" [(ngModel)]="filterParams.price_max" name="price_max" class="form-control form-control-sm" placeholder="100">
+            </div>
+            <div class="col-12 d-flex gap-2 align-items-end justify-content-center">
+              <button type="button" class="btn btn-primary btn-sm px-4" (click)="applyFilters()">
+                <i class="bi bi-search"></i> Apply Filters
+              </button>
+              <button type="button" class="btn btn-outline-secondary btn-sm px-4" (click)="resetFilters()">
+                ✕ Reset
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Games list -->
+  <div class="row">
+    <div class="col-sm-12">
+
+      <!-- Loading -->
+      <div *ngIf="filterLoading" class="text-center p-4">Loading filtered games...</div>
+
+      <ng-container *ngIf="!filterLoading">
+
+        <!-- Filtered games -->
+        <ng-container *ngIf="filteredGames.length > 0; else showDefaultGames">
+          <ng-container *ngFor="let game of filteredGames; trackBy: trackByAppId">
+            <div class="card mb-4 shadow-sm game-card" style="cursor: pointer;" [routerLink]="['/games', game.appid]">
+              <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">{{ game.name }}</h5>
+                <small>App ID: {{ game.appid }}</small>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-4">
+                    <img [src]="'https://cdn.cloudflare.steamstatic.com/steam/apps/' + game.appid + '/capsule_184x69.jpg'"
+                         (error)="onImageError($event)"
+                         class="img-fluid rounded shadow-sm mb-2" alt="{{ game.name }} Capsule">
+                  </div>
+                  <div class="col-md-8">
+                     <p *ngIf="game.developers?.length">
+                       <strong>Developers:</strong>
+                       <span *ngFor="let dev of game.developers" class="badge bg-secondary me-1">{{ dev }}</span>
+                     </p>
+                     <p *ngIf="game.publishers?.length">
+                       <strong>Publishers:</strong>
+                       <span *ngFor="let pub of game.publishers" class="badge bg-light text-dark me-1">{{ pub }}</span>
+                     </p>
+                    <p *ngIf="game.price_overview?.final_formatted || game.price_gbp !== undefined || game.metadata?.price !== undefined || game.price !== undefined">
+                      <strong>Price:</strong>
+                      <span class="badge bg-info text-dark">
+                        {{ formatPrice(game) }}
+                      </span>
+                    </p>
+                    <p *ngIf="game.supported_languages?.length">
+                      <strong>Supported Languages:</strong>
+                      <span *ngFor="let lang of game.supported_languages" class="badge bg-warning text-dark me-1">{{ lang }}</span>
+                    </p>
+                    <p *ngIf="game.tags?.length">
+                      <strong>Tags:</strong>
+                      <span *ngFor="let tag of game.tags" class="badge bg-info text-dark me-1">{{ tag }}</span>
+                    </p>
+                    <div class="mt-3" *ngIf="sortBy === 'topRated'">
+                      <p class="mb-1"><strong>Positive Reviews:</strong></p>
+                      <span class="badge bg-success" style="font-size: 1rem; padding: 0.5rem 1rem;">
+                        👍 {{ game.reviews?.positive | number }}
+                      </span>
+                    </div>
+                    <div class="mt-3" *ngIf="sortBy !== 'topRated'">
+                      <label class="form-label">Review Score</label>
+                      <div *ngIf="game.review_score !== null; else noReviewsFiltered" class="progress" style="height: 20px;">
+                        <div class="progress-bar bg-success" role="progressbar"
+                             [style.width.%]="game.review_score" aria-valuenow="{{ game.review_score }}"
+                             aria-valuemin="0" aria-valuemax="100">
+                          {{ game.review_score }}%
+                        </div>
+                      </div>
+                      <ng-template #noReviewsFiltered>
+                        <div class="alert alert-secondary mb-0" role="alert">
+                          No reviews available
+                        </div>
+                      </ng-template>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="card-footer text-muted text-end">Click for details →</div>
+            </div>
+          </ng-container>
+
+          <!-- Filtered pagination -->
+          <div class="row mt-3 g-2 align-items-center" *ngIf="filterTotalPages > 1">
+            <div class="col-lg-6 d-flex gap-2 flex-wrap">
+              <button class="btn btn-outline-secondary btn-sm" (click)="goToFilterPage(1)" [disabled]="filterPage === 1">« First</button>
+              <button class="btn btn-primary btn-sm" (click)="prevFilterPage()" [disabled]="filterPage === 1">‹ Prev</button>
+              <button class="btn btn-primary btn-sm" (click)="nextFilterPage()" [disabled]="filterPage === filterTotalPages">Next ›</button>
+              <button class="btn btn-outline-secondary btn-sm" (click)="goToFilterPage(filterTotalPages)" [disabled]="filterPage === filterTotalPages">Last »</button>
+            </div>
+            <div class="col-lg-3 text-center">
+              Page {{ filterPage }} of {{ filterTotalPages }}
+            </div>
+            <div class="col-lg-3 text-end d-flex justify-content-end gap-2">
+              <input #filterJump type="number" min="1" [max]="filterTotalPages" class="form-control form-control-sm w-50" placeholder="Page">
+              <button class="btn btn-outline-primary btn-sm" (click)="goToFilterPage(filterJump.value)">Go</button>
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- Default games -->
+        <ng-template #showDefaultGames>
+          <ng-container *ngIf="(games_list$ | async)?.length; else noGames">
+            <ng-container *ngFor="let game of (games_list$ | async); trackBy: trackByAppId">
+              <div class="card mb-4 shadow-sm game-card" style="cursor: pointer;" [routerLink]="['/games', game.appid]">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                  <h5 class="mb-0">{{ game.name }}</h5>
+                  <small>App ID: {{ game.appid }}</small>
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <img [src]="'https://cdn.cloudflare.steamstatic.com/steam/apps/' + game.appid + '/capsule_184x69.jpg'"
+                           (error)="onImageError($event)"
+                           class="img-fluid rounded shadow-sm mb-2" alt="{{ game.name }} Capsule">
+                    </div>
+                    <div class="col-md-8">
+                       <p *ngIf="game.developers?.length">
+                         <strong>Developers:</strong>
+                         <span *ngFor="let dev of game.developers" class="badge bg-secondary me-1">{{ dev }}</span>
+                       </p>
+                       <p *ngIf="game.publishers?.length">
+                         <strong>Publishers:</strong>
+                         <span *ngFor="let pub of game.publishers" class="badge bg-light text-dark me-1">{{ pub }}</span>
+                       </p>
+                       <p *ngIf="game.price_overview?.final_formatted || game.price_gbp !== undefined || game.metadata?.price !== undefined || game.price !== undefined">
+                         <strong>Price:</strong>
+                         <span class="badge bg-info text-dark">
+                           {{ formatPrice(game) }}
+                         </span>
+                       </p>
+                      <p *ngIf="game.supported_languages?.length">
+                        <strong>Supported OS/Platforms:</strong>
+                        <span *ngFor="let lang of game.supported_languages" class="badge bg-warning text-dark me-1">{{ lang }}</span>
+                      </p>
+                      <p *ngIf="game.tags?.length">
+                        <strong>Tags:</strong>
+                        <span *ngFor="let tag of game.tags" class="badge bg-info text-dark me-1">{{ tag }}</span>
+                      </p>
+                      <div class="mt-3">
+                        <label class="form-label">Review Score</label>
+                        <div *ngIf="game.review_score !== null; else noReviews" class="progress" style="height: 20px;">
+                          <div class="progress-bar bg-success" role="progressbar"
+                               [style.width.%]="game.review_score" aria-valuenow="{{ game.review_score }}"
+                               aria-valuemin="0" aria-valuemax="100">
+                            {{ game.review_score }}%
+                          </div>
+                        </div>
+                      </div>
+                      <ng-template #noReviews>
+                        <div class="alert alert-secondary mb-0" role="alert">
+                          No reviews available
+                        </div>
+                      </ng-template>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-footer text-muted text-end">Click for details →</div>
+              </div>
+            </ng-container>
+
+            <!-- Default pagination -->
+            <div class="row mt-3 g-2 align-items-center">
+              <div class="col-lg-6 d-flex gap-2 flex-wrap">
+                <button class="btn btn-outline-secondary btn-sm" (click)="goToPage(1)" [disabled]="page === 1">« First</button>
+                <button class="btn btn-primary btn-sm" (click)="previousPage()" [disabled]="page === 1">‹ Prev</button>
+                <button class="btn btn-primary btn-sm" (click)="nextPage()" [disabled]="page === totalPages">Next ›</button>
+                <button class="btn btn-outline-secondary btn-sm" (click)="goToPage(totalPages)" [disabled]="page === totalPages">Last »</button>
+              </div>
+              <div class="col-lg-3 text-center">
+                Page {{ page }} of {{ totalPages }}
+              </div>
+              <div class="col-lg-3 text-end d-flex justify-content-end gap-2">
+                <input #pageJump type="number" min="1" [max]="totalPages" class="form-control form-control-sm w-50" placeholder="Page">
+                <button class="btn btn-outline-primary btn-sm" (click)="goToPage(pageJump.value)">Go</button>
+              </div>
+            </div>
+          </ng-container>
+
+          <!-- No games -->
+          <ng-template #noGames>
+            <div class="text-center mt-5">
+              <h4>No games match your filters.</h4>
+            </div>
+          </ng-template>
+
+        </ng-template>
+
+      </ng-container>
+    </div>
+  </div>
+</div>

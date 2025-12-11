@@ -1,0 +1,147 @@
+[
+  {
+  "_id": {
+    "$oid": "690b682f6342bf5a410ea294"
+  },
+  "username": "laury",
+  "email": "laury@gmail.com",
+  "password": "scrypt:32768:8:1$CQkn4090SDtNFmT9$f466f70da247096812d9ac505201b6074b72229fb3923ac1db805898ecf7684f6e29e48b56f64ffcc4e86532f901bfb791b100f504a2917c444b0fd121b70a57",
+  "roles": "user",
+  "created_at": {
+    "$date": "2025-11-05T15:07:27.423Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "690b6c04040c9ed9bfc4b760"
+  },
+  "username": "laury1",
+  "email": "laury1@gmail.com",
+  "password": "scrypt:32768:8:1$vfK0CA0EhmPOvBzA$68d01258da96098b2c60c19351d01304ea04c36902788d8ae6c3f3c87d79bd1672d08d1bdccedfa9d25e55822fbeb6cc4e8c7fb335ab5679570717d71bd496a7",
+  "created_at": {
+    "$date": "2025-11-05T15:23:48.599Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "690b6d78e7e85051a0674910"
+  },
+  "username": "laury2",
+  "email": "laury2@gmail.com",
+  "password": "scrypt:32768:8:1$mf9YInBKs6rBj3UC$cdb0273cfbd2dd34eaa8b05fcf4e4c36f83710d6bcc2a8d870b3d09503dc3643b22838257c99124a293c3eead0ab4cfddbbd8316b63964f9a54a3521b648589b",
+  "created_at": {
+    "$date": "2025-11-05T15:30:00.289Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "690b6e26e7e85051a0674911"
+  },
+  "username": "laury3",
+  "email": "laury3@gmail.com",
+  "password": "scrypt:32768:8:1$uqBDQbgU9hiYoGnt$786ef8a59edfa58a8f4b9e1327c4ffdb358976cbf49254a4aa0af4e8acabd98bd50e5fb67922272f94d14b71d7b3ebeeeb2ae33ca9ed8c5a7a5b4d628c8a9da3",
+  "created_at": {
+    "$date": "2025-11-05T15:32:54.834Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "690b783cebe67fb0e779f412"
+  },
+  "username": "laurya",
+  "email": "laurya@gmail.com",
+  "password": "scrypt:32768:8:1$epyPwntGLOEjz5s9$6b2abcb2cffcdacc307e9f44732860ca6a403b34f72565b5ece3a2afb77abf70bab4426fd476d4bb5889cde228f067b873a3512acce850872043061a581285db",
+  "role": "admin",
+  "created_at": {
+    "$date": "2025-11-05T16:15:56.734Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "690ceb1fba7c30b2b88f6893"
+  },
+  "username": "admin11",
+  "password": "scrypt:32768:8:1$RzhW042yocTQNpCH$8ef5c8d7cef3ea8c91bdd843d11cf4522ec07624a8986c4679cc16316869b7a2b35ae32c209caa11ea7fc22233c75baa1287aa07bd1e160f0835ef744ae386c0",
+  "role": "admin",
+  "created_at": {
+    "$date": "2025-11-06T18:38:23.508Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "690ceb2bba7c30b2b88f6894"
+  },
+  "username": "testuser",
+  "password": "scrypt:32768:8:1$6VqQScRyvobSF0Tk$eac40a64e33fe1107a70328d832c0de294c8c17d0c6f06e7344858594eacf7d68b0b573d85558591840f72f6a0b5b9306663f8d2a87f98a3923aa9c117159d2d",
+  "role": "user",
+  "created_at": {
+    "$date": "2025-11-06T18:38:35.16Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "690cfa2c825b10460ef34ccc"
+  },
+  "username": "admin12",
+  "password": "scrypt:32768:8:1$egOD14UnKM0bN4Ki$80851599caeea56074521b9bae9e8956bca221573d20d42f220988a4cfd0feb9167f547a181335b3e4f1e6c2b5d466987cb472709a4cfa012a8435e0dcea2918",
+  "role": "admin",
+  "created_at": {
+    "$date": "2025-11-06T19:42:36.872Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "690d0584825b10460ef34ce3"
+  },
+  "username": "yes",
+  "password": "scrypt:32768:8:1$NNOLzc821JBz673n$698ef1adef00bbd5e3efa23e90374db8220407d25e2585fac3b147c708273a3ded80fd923a203ee03255c8e21db0ecd66a149daf9aa45121b9205b62212346d1",
+  "role": "user",
+  "created_at": {
+    "$date": "2025-11-06T20:31:00.248Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "690d05f4825b10460ef34ce6"
+  },
+  "username": "no",
+  "password": "scrypt:32768:8:1$4pQzgrBiS5R5jHAs$cbe052d1f09116a983b36bf32d068748f8da0a2b925142c83434908c0de10a180a1707464bf0de03820319bb7ed606627db566a9477ff939eb4968d05ce18aed",
+  "role": "user",
+  "created_at": {
+    "$date": "2025-11-06T20:32:52.919Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "690d0732825b10460ef34ce9"
+  },
+  "username": "admin13",
+  "password": "scrypt:32768:8:1$eincOq1mN7AkPqsR$a2ba00ae53ade35025a84917988d8ab71f5bad0f871a55337c504a5d829003627861b0b5dc8fa1f5a0f061d9331253142404a7171d5710948f4513e74a85c256",
+  "role": "admin",
+  "created_at": {
+    "$date": "2025-11-06T20:38:10.515Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "690d0747825b10460ef34cea"
+  },
+  "username": "admin14",
+  "password": "scrypt:32768:8:1$DQSCmrYQkBu7Tboq$5795cac4b4705a96a538c0a5ef6b23e203b1f1c5183c3644e576e5b1c8849c52cf850f0d151cff43faa4d405d47ee9f9244c987e3614ec4973b93537568b84f5",
+  "role": "admin",
+  "created_at": {
+    "$date": "2025-11-06T20:38:31.364Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "690d0789825b10460ef34cef"
+  },
+  "username": "admin15",
+  "password": "scrypt:32768:8:1$lAaXh4ZherQHDZCP$7cae234f62ae2819cff235b68f65c6ffba47ea44a8b0951fa7fcf149358e13abeabf0e0ddb95332b573aff8ee73414470620cfd7e39a8d1394f4d5c5a7e6e439",
+  "role": "admin",
+  "created_at": {
+    "$date": "2025-11-06T20:39:37.409Z"
+  }
+}
+]

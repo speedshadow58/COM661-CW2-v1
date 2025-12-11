@@ -1,0 +1,28 @@
+<div class="navbar navbar-expand-sm bg-primary navbar-dark fixed-top">
+  <span class="navbar-brand">
+    Steam Directory App
+  </span>
+
+  <ul class="navbar-nav">
+    <li class="nav-item">
+      <a class="nav-link" routerLink="/home" routerLinkActive="active">Home</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" routerLink="/games" routerLinkActive="active">Games</a>
+    </li>
+    <li class="nav-item dropdown" *ngIf="isAdmin()">
+      <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" (click)="$event.preventDefault();">
+        🛡️ Admin
+      </a>
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" routerLink="/admin" (click)="closeDropdown($event)">📝 Reviews & Logs</a></li>
+        <li><a class="dropdown-item" routerLink="/admin/games" (click)="closeDropdown($event)">🎮 Game Management</a></li>
+        <li><a class="dropdown-item" routerLink="/admin/developers" (click)="closeDropdown($event)">👨‍💻 Developer Management</a></li>
+      </ul>
+    </li>
+  </ul>
+
+  <div class="form-inline ms-auto" style="margin-right: 10px">
+    <app-authbutton></app-authbutton>
+  </div>
+</div>

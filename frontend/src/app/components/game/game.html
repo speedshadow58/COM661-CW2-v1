@@ -1,0 +1,309 @@
+<div class="container mt-5" *ngIf="game$ | async as game">
+  <!-- MAIN GAME CARD -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center gap-2">
+        <h5 class="mb-0">{{ game.name }}</h5>
+        <ng-container *ngIf="isAdmin">
+          <button class="btn btn-outline-danger btn-lg fw-bold ms-3 px-4 py-1 d-flex align-items-center shadow"
+                  (click)="goToEditGame(game.appid)"
+                  style="border-radius: 2rem; font-size:1.1rem; border-width:2px; box-shadow: 0 2px 12px #0002;"
+                  title="Edit this game">
+            <i class="bi bi-pencil-square me-2"></i> Edit Game
+          </button>
+        </ng-container>
+      </div>
+      <small>App ID: {{ game.appid }}</small>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <!-- LEFT COLUMN: Images -->
+        <div class="col-md-6 text-center">
+          <img [src]="getHeaderImage()"
+            (error)="onImageError($event)"
+            class="img-fluid rounded mb-3 shadow-sm"
+            alt="Header Image">
+          <img [src]="getCapsuleImage()"
+            (error)="onImageError($event)"
+            class="img-fluid rounded shadow-sm"
+            alt="Capsule Image">
+        </div>
+        <!-- RIGHT COLUMN: Details -->
+        <div class="col-md-6">
+          <p><strong>Developers:</strong></p>
+          <div>
+            <span *ngFor="let d of game.developers" class="badge bg-primary text-white me-1 mb-1">{{ d }}</span>
+          </div>
+
+          <p class="mt-2"><strong>Publishers:</strong></p>
+          <div>
+            <span *ngFor="let p of game.publishers" class="badge bg-success text-white me-1 mb-1">{{ p }}</span>
+          </div>
+
+
+
+          <p class="mt-2"><strong>Tags:</strong></p>
+          <div>
+            <span *ngFor="let t of game.tags" class="badge bg-warning text-dark me-1 mb-1">{{ t }}</span>
+          </div>
+
+          <!-- Review Summary -->
+          <div class="mt-3">
+            <strong>Review Summary:</strong>
+            <div class="progress" style="height: 22px;">
+              <div class="progress-bar bg-success" role="progressbar"
+                [style.width.%]="reviewPercentages.positivePct">
+                {{ reviewPercentages.positivePct }}%
+              </div>
+              <div class="progress-bar bg-danger" role="progressbar"
+                [style.width.%]="reviewPercentages.negativePct">
+                {{ reviewPercentages.negativePct }}%
+              </div>
+            </div>
+          </div>
+
+          <p class="mt-3"><strong>Description:</strong></p>
+          <p class="text-muted">{{ game.short_description || 'No description available.' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEAM INFO CARD -->
+  <div *ngIf="steamDetails" class="card mb-4 shadow-sm">
+    <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">Steam Information</h5>
+      <button class="btn btn-sm btn-light" (click)="refreshSteamDetails()">Refresh Steam Data</button>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <!-- Trailer -->
+        <div class="col-md-6" *ngIf="steamTrailer">
+          <h6 class="mb-2">Trailer: {{ steamTrailer.name }}</h6>
+          <video id="trailer" controls autoplay muted playsinline style="width: 100%; border-radius: 12px;">
+            Your browser does not support the video tag.
+          </video>
+          <div class="mt-2 text-muted small">
+            Format: {{ trailerFormatLabel }}<br>
+            Status: {{ retryStatusLabel }}
+          </div>
+        </div>
+
+        <!-- Steam Details -->
+        <div class="col-md-6">
+          <p><strong>Price:</strong> {{ steamDetails.price_overview?.final_formatted || 'Free / Unknown' }}</p>
+          <p><strong>Release Date:</strong> {{ steamDetails.release_date?.date || 'Unknown' }}</p>
+
+          <p><strong>Genres:</strong></p>
+          <div>
+            <span *ngFor="let g of steamDetails.genres" class="badge bg-info text-dark me-1 mb-1">{{ g.description
+              }}</span>
+          </div>
+
+          <div *ngIf="steamDetails?.categories?.length" class="mt-3">
+            <h6>Categories</h6>
+            <span *ngFor="let c of steamDetails.categories" class="badge bg-warning text-dark me-1 mb-1">{{
+              c.description }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screenshots -->
+      <div *ngIf="steamScreenshots?.length" class="mt-4 text-center">
+        <h6 class="mb-2">Screenshots ({{ getScreenshotCounter() }})</h6>
+        <img [src]="steamScreenshots[currentSlide]?.path_full" class="img-fluid rounded shadow-sm"
+          (click)="openScreenshotModal(steamScreenshots[currentSlide])">
+        <div class="d-flex justify-content-center gap-2 mt-3">
+          <button class="btn btn-outline-primary btn-sm" (click)="prevSlide()">❮ Prev</button>
+          <button class="btn btn-outline-primary btn-sm" (click)="nextSlide()">Next ❯</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- PLAYTIME CHART -->
+  <app-playtime-chart *ngIf="game.playtime" [playtime]="game.playtime"></app-playtime-chart>
+
+  <!-- SYSTEM SPECS CARD -->
+  <div *ngIf="steamDetails?.pc_requirements" class="card mb-4 shadow-sm">
+    <div class="card-header bg-warning text-dark">
+      <h5 class="mb-0">System Requirements</h5>
+    </div>
+    <div class="card-body">
+      <div [innerHTML]="steamDetails.pc_requirements.minimum"></div>
+      <div [innerHTML]="steamDetails.pc_requirements.recommended"></div>
+    </div>
+  </div>
+
+<!-- ACHIEVEMENTS CARD -->
+<div *ngIf="achievementsList.length" class="card mb-4 shadow-sm">
+
+  <!-- Header with Sort Button -->
+  <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">Achievements ({{ achievementsTotal }})</h5>
+    <div>
+      <button class="btn btn-sm btn-outline-light me-2" (click)="sortAchievements('rarity')">
+        Sort by Rarity
+      </button>
+      <small>Page {{ currentAchPage }} / {{ totalAchPages }}</small>
+    </div>
+  </div>
+
+  <div class="card-body">
+
+    <!-- Color Legend -->
+    <div class="mb-3 d-flex flex-wrap gap-2">
+      <span class="badge bg-warning text-dark">Very Rare (0–5%)</span>
+      <span class="badge bg-primary text-white">Rare (6–20%)</span>
+      <span class="badge bg-success text-white">Uncommon (21–50%)</span>
+      <span class="badge bg-secondary text-white">Common / N/A (51–100%)</span>
+    </div>
+
+    <!-- Achievements Grid -->
+    <div class="row g-3 justify-content-start">
+      <div *ngFor="let ach of pagedAchievements" class="col-auto text-center">
+
+        <div class="p-2 rounded shadow-sm achievement-box"
+             [ngClass]="'bg-' + getAchievementColor(ach)"
+             (mouseenter)="hoverAchievement(ach)"
+             (mouseleave)="leaveAchievement()"
+             style="cursor: pointer; width: 100px; height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;">
+
+          <!-- Achievement Image -->
+          <img
+            [src]="getAchievementImage(ach)"
+            alt="Achievement Badge"
+            class="img-fluid rounded mb-1"
+            style="width: 64px; height: 64px; object-fit: contain;"
+          >
+
+          <!-- Name -->
+          <div class="small text-white fw-bold mt-1 text-center" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 100%;">
+            {{ ach.displayName || ach.name }}
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Hover Tooltip -->
+    <div *ngIf="hoveredAchievement" class="mt-3 p-2 border rounded bg-light shadow-sm">
+      <strong>{{ hoveredAchievement.displayName || hoveredAchievement.name }}</strong><br>
+      <span>{{ hoveredAchievement.description || 'No description available.' }}</span>
+      <div class="text-muted small">Rarity: {{ hoveredAchievement.rarity || 'N/A' }}%</div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="d-flex justify-content-between mt-3">
+      <button class="btn btn-sm btn-outline-primary"
+              (click)="prevAchPage()"
+              [disabled]="currentAchPage === 1">
+        ❮ Prev
+      </button>
+
+      <button class="btn btn-sm btn-outline-primary"
+              (click)="nextAchPage()"
+              [disabled]="currentAchPage === totalAchPages">
+        Next ❯
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+  <!-- USER REVIEWS CARD -->
+  <div class="card mb-4 shadow-sm" *ngIf="getAllReviews()?.length">
+    <div class="card-header bg-info text-white">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="mb-0">User Reviews ({{ getReviewStats().total }})</h5>
+        <span class="badge bg-light text-dark">Average: {{ getReviewStats().avgRating }}/100</span>
+      </div>
+      
+      <!-- Sort and Filter Controls -->
+      <div class="d-flex gap-2 flex-wrap">
+        <div class="btn-group btn-group-sm" role="group">
+          <button type="button" class="btn btn-outline-light" [class.active]="reviewSortBy === 'date'" (click)="sortReviews('date')">
+            📅 Date
+          </button>
+          <button type="button" class="btn btn-outline-light" [class.active]="reviewSortBy === 'rating'" (click)="sortReviews('rating')">
+            ⭐ Rating
+          </button>
+          <button type="button" class="btn btn-outline-light" [class.active]="reviewSortBy === 'username'" (click)="sortReviews('username')">
+            👤 User
+          </button>
+        </div>
+        
+        <div class="btn-group btn-group-sm" role="group">
+          <button type="button" class="btn btn-outline-light" [class.active]="reviewFilter === 'all'" (click)="setReviewFilter('all')">
+            All ({{ getReviewStats().total }})
+          </button>
+          <button type="button" class="btn btn-outline-light" [class.active]="reviewFilter === 'positive'" (click)="setReviewFilter('positive')">
+            👍 Positive ({{ getReviewStats().positive }})
+          </button>
+          <button type="button" class="btn btn-outline-light" [class.active]="reviewFilter === 'negative'" (click)="setReviewFilter('negative')">
+            👎 Negative ({{ getReviewStats().negative }})
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div *ngFor="let r of getFilteredAndSortedReviews(); trackBy: trackByReview; let last = last"
+        class="mb-3 p-3 border rounded bg-light shadow-sm">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <strong class="text-primary">{{ r.username }}</strong>
+            <small class="text-muted ms-2" *ngIf="r.created_at">
+              • {{ formatReviewDate(r.created_at) }}
+            </small>
+          </div>
+          <div class="d-flex gap-2 align-items-center">
+            <span class="badge bg-secondary">{{ r.rating }}/100</span>
+            <button *ngIf="canEditReview(r)" type="button" class="btn btn-sm btn-outline-primary" (click)="editReview(r)">Edit</button>
+            <button *ngIf="canDeleteReview(r)" type="button" class="btn btn-sm btn-outline-danger" (click)="deleteReview(r)">Delete</button>
+          </div>
+        </div>
+        <p class="fst-italic mt-2">{{ r.comment }}</p>
+        <hr *ngIf="!last">
+      </div>
+    </div>
+  </div>
+
+  <!-- REVIEW SUBMISSION -->
+  <div class="card mb-5 shadow-sm" id="review-form-card">
+    <div class="card-header bg-dark text-white">
+      <h5 class="mb-0">{{ editingReviewId ? 'Edit Review' : 'Leave a Review' }}</h5>
+      <small>Login optional - reviews posted anonymously or with your username</small>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="reviewForm" (ngSubmit)="submitReview()">
+        <div class="form-group mb-3" *ngIf="!(token$ | async)">
+          <label class="form-label">Display Name (optional)</label>
+          <input type="text" class="form-control" formControlName="username" placeholder="Leave blank for 'Anonymous'">
+          <small class="text-muted">Choose a name to display with your review, or leave blank to post anonymously</small>
+        </div>
+        <div class="form-group mb-3">
+          <label class="form-label">Your Review</label>
+          <textarea rows="3" class="form-control" formControlName="comment"
+            [ngClass]="{ 'is-invalid': reviewForm.get('comment')?.invalid && reviewForm.get('comment')?.touched }"></textarea>
+        </div>
+        <div class="form-group mb-3">
+          <label class="form-label">Rating (0–100)</label>
+          <input type="number" class="form-control" formControlName="rating" min="0" max="100"
+            [ngClass]="{ 'is-invalid': reviewForm.get('rating')?.invalid && reviewForm.get('rating')?.touched }">
+        </div>
+        <div *ngIf="reviewForm.invalid" class="text-danger mb-2">
+          Please fill out all required fields before submitting your review.
+        </div>
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary" [disabled]="reviewForm.invalid">
+            {{ editingReviewId ? 'Update Review' : 'Submit Review' }}
+          </button>
+          <button *ngIf="editingReviewId" type="button" class="btn btn-outline-secondary" (click)="cancelEdit()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

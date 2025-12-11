@@ -1,0 +1,224 @@
+
+<!-- Success/Error Messages -->
+<div *ngIf="success" class="alert alert-success text-center" style="max-width:900px;margin:16px auto 0;">{{ success }}</div>
+<div *ngIf="error" class="alert alert-danger text-center" style="max-width:900px;margin:16px auto 0;">{{ error }}</div>
+
+<!-- Add Game Form (Improved) -->
+<form class="mb-4 p-3 border rounded bg-light shadow-sm" (ngSubmit)="addGame()" #addGameForm="ngForm" style="max-width: 900px; margin: 0 auto;">
+  <div class="row g-3 align-items-end">
+    <div class="col-md-3">
+      <label class="form-label mb-1">AppID</label>
+      <input type="number" class="form-control" required [(ngModel)]="newGame.appid" name="appid" placeholder="AppID" />
+    </div>
+    <div class="col-md-3">
+      <label class="form-label mb-1">Name</label>
+      <input type="text" class="form-control" required [(ngModel)]="newGame.name" name="name" placeholder="Name" />
+    </div>
+    <div class="col-md-3">
+      <label class="form-label mb-1">Release Date</label>
+      <input type="date" class="form-control" required [(ngModel)]="newGame.release_date" name="release_date" placeholder="Release Date" />
+    </div>
+    <div class="col-md-3">
+      <label class="form-label mb-1">Price (£)</label>
+      <input type="number" class="form-control" required min="0" step="0.01" [(ngModel)]="newGame.price" name="price" placeholder="Price" />
+    </div>
+  </div>
+  <div class="row g-3 align-items-end mt-2">
+    <div class="col-md-3">
+      <label class="form-label mb-1">Genres</label>
+      <input type="text" class="form-control" [(ngModel)]="newGame.genres" name="genres" placeholder="Genres (comma)" />
+    </div>
+    <div class="col-md-3">
+      <label class="form-label mb-1">Tags</label>
+      <input type="text" class="form-control" [(ngModel)]="newGame.tags" name="tags" placeholder="Tags (comma)" />
+    </div>
+    <div class="col-md-3">
+      <label class="form-label mb-1">Peak CCU</label>
+      <input type="number" class="form-control" [(ngModel)]="newGame.peak_ccu" name="peak_ccu" placeholder="Peak CCU" />
+    </div>
+    <div class="col-md-3">
+      <label class="form-label mb-1">Developers</label>
+      <input type="text" class="form-control" [(ngModel)]="newGame.developers" name="developers" placeholder="Developers (comma)" />
+    </div>
+    <div class="col-12 d-flex align-items-end justify-content-center mt-2">
+      <button class="btn btn-success px-4" [disabled]="loading" style="height: 38px;">Add Game</button>
+    </div>
+  </div>
+</form>
+
+<!-- Dashboard Cards -->
+<div class="row mb-4" *ngIf="stats">
+  <div class="col-md-3 mb-3">
+    <div class="card bg-primary text-white h-100">
+      <div class="card-body text-center">
+        <h5>Total Games</h5>
+        <h2>{{ stats.total_games }}</h2>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 mb-3">
+    <div class="card bg-success text-white h-100">
+      <div class="card-body text-center">
+        <h5>Total Reviews</h5>
+        <h2>{{ stats.total_reviews }}</h2>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 mb-3">
+    <div class="card bg-warning text-dark h-100">
+      <div class="card-body text-center">
+        <h5>Recent Reviews (1h)</h5>
+        <h2>{{ stats.recent_hour_reviews }}</h2>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 mb-3">
+    <div class="card bg-info text-dark h-100">
+      <div class="card-body text-center">
+        <h5>Avg. Price (GBP)</h5>
+        <h2>£{{ stats.average_price }}</h2>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 mb-3">
+    <div class="card bg-secondary text-white h-100 w-100" style="min-height: 120px;">
+      <div class="card-body d-flex flex-column justify-content-center align-items-center p-4" style="width: 100%;">
+        <div class="w-100 text-center">
+          <h5>Top Peak CCU Game</h5>
+          <h2>{{ stats.top_peak_game?.name || 'N/A' }}</h2>
+          <div *ngIf="stats.top_peak_game?.appid">
+            <span class="badge bg-light text-dark">AppID: {{ stats.top_peak_game.appid }}</span>
+            <span class="badge bg-warning text-dark ms-2">Peak CCU: {{ stats.top_peak_game.peak_ccu }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- Search Bar -->
+<div class="mb-4">
+  <div class="input-group" style="max-width: 400px; margin: 0 auto;">
+    <input
+      type="text"
+      [(ngModel)]="searchTerm"
+      (keyup.enter)="searchGames()"
+      placeholder="Search by name, genre, tag, or developer..."
+      class="form-control"
+    />
+    <button (click)="searchGames()" class="btn btn-outline-secondary" [disabled]="loading">
+      🔍 Search
+    </button>
+    <button class="btn btn-outline-secondary" (click)="searchTerm = ''; searchGames()">Clear</button>
+  </div>
+</div>
+
+<!-- Loading Spinner -->
+<div *ngIf="loading" class="text-center my-5">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading games...</span>
+  </div>
+</div>
+
+<div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+<!-- Games Table -->
+<div *ngIf="!loading" class="table-responsive">
+  <table class="table table-striped table-hover align-middle">
+    <thead class="table-dark">
+      <tr>
+        <th>AppID</th>
+        <th>Name</th>
+        <th>Genres</th>
+        <th>Tags</th>
+        <th>Languages</th>
+        <th>Developers</th>
+        <th>Publishers</th>
+        <th>Peak CCU</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let game of pagedGames">
+        <td><span class="badge bg-secondary">{{ game.appid }}</span></td>
+        <td>
+          <span *ngIf="editGameId !== game.appid">{{ game.name }}</span>
+          <input *ngIf="editGameId === game.appid" type="text" class="form-control form-control-sm" [(ngModel)]="editGame.name" name="editName{{game.appid}}" />
+        </td>
+        <td>
+          <span *ngIf="editGameId !== game.appid">
+            <span *ngFor="let genre of game.details?.genres; let last = last">
+              <span class="badge bg-info text-dark me-1">{{ genre }}</span><span *ngIf="!last"> </span>
+            </span>
+            <span *ngIf="!game.details?.genres?.length" class="text-muted">N/A</span>
+          </span>
+          <input *ngIf="editGameId === game.appid" type="text" class="form-control form-control-sm" [(ngModel)]="editGame.genres" name="editGenres{{game.appid}}" />
+        </td>
+        <td>
+          <span *ngIf="editGameId !== game.appid">
+            <span *ngFor="let tag of game.details?.tags; let last = last">
+              <span class="badge bg-warning text-dark me-1">{{ tag }}</span><span *ngIf="!last"> </span>
+            </span>
+            <span *ngIf="!game.details?.tags?.length" class="text-muted">N/A</span>
+          </span>
+          <input *ngIf="editGameId === game.appid" type="text" class="form-control form-control-sm" [(ngModel)]="editGame.tags" name="editTags{{game.appid}}" />
+        </td>
+        <td>
+          <span *ngIf="editGameId !== game.appid">
+            <span *ngFor="let lang of game.details?.supported_languages; let last = last">
+              <span class="badge bg-success text-light me-1">{{ lang }}</span><span *ngIf="!last"> </span>
+            </span>
+            <span *ngIf="!game.details?.supported_languages?.length" class="text-muted">N/A</span>
+          </span>
+          <input *ngIf="editGameId === game.appid" type="text" class="form-control form-control-sm" [(ngModel)]="editGame.supported_languages" name="editLangs{{game.appid}}" />
+        </td>
+        <td>
+          <span *ngIf="editGameId !== game.appid">
+            <span *ngFor="let dev of game.companies?.developers; let last = last">
+              <span class="badge bg-primary text-light me-1">{{ dev }}</span><span *ngIf="!last"> </span>
+            </span>
+            <span *ngIf="!game.companies?.developers?.length" class="text-muted">N/A</span>
+          </span>
+          <input *ngIf="editGameId === game.appid" type="text" class="form-control form-control-sm" [(ngModel)]="editGame.developers" name="editDevs{{game.appid}}" />
+        </td>
+        <td>
+          <span *ngIf="editGameId !== game.appid">
+            <span *ngFor="let pub of game.companies?.publishers; let last = last">
+              <span class="badge bg-secondary text-light me-1">{{ pub }}</span><span *ngIf="!last"> </span>
+            </span>
+            <span *ngIf="!game.companies?.publishers?.length" class="text-muted">N/A</span>
+          </span>
+          <input *ngIf="editGameId === game.appid" type="text" class="form-control form-control-sm" [(ngModel)]="editGame.publishers" name="editPubs{{game.appid}}" />
+        </td>
+        <td>
+          <span *ngIf="editGameId !== game.appid">
+            <span class="badge bg-dark">{{ game.stats?.peak_ccu || 0 }}</span>
+          </span>
+          <input *ngIf="editGameId === game.appid" type="number" class="form-control form-control-sm" [(ngModel)]="editGame.peak_ccu" name="editPeak{{game.appid}}" />
+        </td>
+        <td>
+          <ng-container *ngIf="editGameId !== game.appid">
+            <button class="btn btn-sm btn-primary me-1" (click)="startEditGame(game)">Edit</button>
+            <button class="btn btn-sm btn-danger" (click)="deleteGame(game)">Delete</button>
+          </ng-container>
+          <ng-container *ngIf="editGameId === game.appid">
+            <button class="btn btn-sm btn-success me-1" (click)="saveEditGame(game)">Save</button>
+            <button class="btn btn-sm btn-secondary" (click)="cancelEditGame()">Cancel</button>
+          </ng-container>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div *ngIf="!pagedGames.length" class="alert alert-warning">No games found.</div>
+
+  <!-- Pagination -->
+  <div class="d-flex justify-content-between align-items-center mt-3">
+    <button class="btn btn-outline-primary" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
+      ❮ Previous
+    </button>
+    <span>Page {{ currentPage }} of {{ totalPages }} (showing {{ pageSize }} per page)</span>
+    <button class="btn btn-outline-primary" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">
+      Next ❯
+    </button>
+  </div>
+</div>
+</div>

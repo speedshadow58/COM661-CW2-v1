@@ -1,0 +1,6 @@
+/* Make success messages more readable on blue backgrounds */
+.auth-success-message {
+	color: #00ff99;
+	font-weight: bold;
+	text-shadow: 1px 1px 2px #003366;
+}
